@@ -14,14 +14,14 @@ mk = MnemonicKey(mnemonic=seed)
 wallet = terra.wallet(mk)
 
 
-def withdraw_collat(res):
+def withdraw_collat(collat_token):
     fee = StdFee(982360, "147355uusd")
     exec_msg = MsgExecuteContract(
         wallet.key.acc_address,
         mm_liquidation_queue,
         {
             "claim_liquidations": {
-                "collateral_token": res["bids"][0]["collateral_token"],
+                "collateral_token": collat_token,
             }
         },
     )
@@ -63,7 +63,7 @@ def main():
     if len(bluna_res["bids"]) > 0:
         pending_collat = int((bluna_res["bids"][0]["pending_liquidated_collateral"]))
         if pending_collat > 0:
-            withdraw_collat(bluna_res)
+            withdraw_collat(bluna_res["bids"][0]["collateral_token"])
         else:
             print("No pending bluna collateral")
     else:
@@ -72,7 +72,7 @@ def main():
     if len(beth_res["bids"]) > 0:
         pending_collat = int((beth_res["bids"][0]["pending_liquidated_collateral"]))
         if pending_collat > 0:
-            withdraw_collat(beth_res)
+            withdraw_collat(beth_res["bids"][0]["collateral_token"])
         else:
             print("No pending beth collateral")
     else:
